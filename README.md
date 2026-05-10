@@ -1,2 +1,3 @@
-# TP-Integrador-Computacion
-Trabajo practico integrador grupal
+# TP Integrador Computación Aplicada
+
+Repositorio grupal del trabajo práctico integrador.
