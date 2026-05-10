@@ -55,9 +55,9 @@ Posteriormente se reinició el sistema e inició sesión correctamente con el nu
 passwd
 ```
 
-#### Evidencia de recuperación de contraseña
+#### Evidencia de ejecución del comando passwd
 
-![Password root restablecida](Capturas/passwd-root-reset.png)
+![Ejecución del comando passwd](Capturas/passwd-root-reset.png)
 
 
 ### 3. Configuración de hostname
@@ -230,4 +230,79 @@ ping -c 4 8.8.8.8
 
 ![IP estática configurada](Capturas/ip-estatica-ok.png)
 
+### 9. Transferencia de clave pública mediante SCP
+
+Con el objetivo de configurar la autenticación SSH mediante claves pública/privada, se realizó la transferencia de la clave pública proporcionada en la consigna desde la máquina física Windows hacia la máquina virtual Debian.
+
+Para ello se utilizó el protocolo SCP (Secure Copy Protocol), el cual permite transferir archivos de manera segura utilizando una conexión SSH cifrada.
+
+Previamente se habilitó temporalmente el acceso del usuario `root` mediante contraseña en el archivo `/etc/ssh/sshd_config`, permitiendo establecer la autenticación inicial necesaria para la transferencia del archivo.
+
+La transferencia se realizó correctamente desde PowerShell en Windows hacia el directorio `/root/` de la máquina virtual Debian utilizando la dirección IP estática configurada anteriormente.
+
+Posteriormente se verificó la correcta recepción del archivo `clave_publica.pub` dentro del sistema Linux.
+
+
+#### Comandos utilizados
+
+```bash
+nano /etc/ssh/sshd_config
+
+systemctl restart ssh
+
+scp .\clave_publica.pub root@192.168.1.50:/root/
+
+ls /root
+```
+
+#### Evidencia de transferencia SCP de clave pública
+
+![Transferencia SCP exitosa](Capturas/scp-clave-publica-ok.png)
+
+### 10. Configuración de autenticación SSH mediante claves
+
+Con el objetivo de mejorar la seguridad del acceso remoto y cumplir con los requisitos de la consigna, se configuró la autenticación SSH mediante claves pública/privada para el usuario `root`.
+
+Inicialmente se transfirió la clave pública proporcionada en el material adicional hacia la máquina virtual Debian utilizando el protocolo SCP (Secure Copy Protocol).
+
+Posteriormente se creó el directorio `/root/.ssh` y se agregó la clave pública al archivo `authorized_keys`, utilizado por OpenSSH para validar usuarios autorizados mediante criptografía asimétrica.
+
+También se configuraron permisos restrictivos sobre los archivos y directorios relacionados con SSH utilizando `chmod`, debido a que OpenSSH requiere permisos seguros para permitir el uso de claves privadas y públicas.
+
+Desde la máquina física Windows se utilizó la clave privada `clave_privada.txt` para establecer una conexión SSH remota hacia el servidor Debian, verificando el correcto funcionamiento de la autenticación sin necesidad de utilizar contraseña.
+
+Finalmente, una vez validado el acceso mediante claves, se volvió a deshabilitar el acceso remoto de `root` mediante password, dejando habilitada únicamente la autenticación por clave SSH.
+
+
+#### Comandos utilizados
+
+```bash
+mkdir -p /root/.ssh
+
+cat /root/clave_publica.pub >> /root/.ssh/authorized_keys
+
+chmod 700 /root/.ssh
+
+chmod 600 /root/.ssh/authorized_keys
+
+nano /etc/ssh/sshd_config
+
+systemctl restart ssh
+```
+
+#### Comandos utilizados desde Windows PowerShell
+
+```powershell
+scp .\clave_publica.pub root@192.168.1.50:/root/
+
+ssh -i .\clave_privada.txt root@192.168.1.50
+```
+
+#### Evidencia de transferencia SCP de clave pública
+
+![Transferencia SCP exitosa](Capturas/scp-clave-publica-ok.png)
+
+#### Evidencia de autenticación SSH mediante clave privada
+
+![Login SSH mediante clave privada](Capturas/ssh-key-login-ok.png)
 
