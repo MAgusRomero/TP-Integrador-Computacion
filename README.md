@@ -306,3 +306,122 @@ ssh -i .\clave_privada.txt root@192.168.1.50
 
 ![Login SSH mediante clave privada](Capturas/ssh-key-login-ok.png)
 
+### 11. Instalación y configuración de Apache + PHP
+
+Se instaló el servidor web Apache junto con soporte para PHP, permitiendo ejecutar aplicaciones web dinámicas sobre Debian 12.
+
+Inicialmente se verificó el correcto funcionamiento del servicio Apache mediante `systemctl status apache2`, confirmando que el servidor HTTP se encontraba activo y escuchando conexiones entrantes sobre el puerto 80.
+
+Posteriormente se comprobó el acceso desde la máquina física Windows mediante navegador web, verificando la correcta visualización de la página por defecto de Apache.
+
+Luego se copiaron los archivos `index.php` y `logo.png` desde el directorio `/root` hacia `/var/www/html`, correspondiente al directorio web utilizado por Apache para publicar contenido HTTP.
+
+Finalmente se eliminó el archivo `index.html` predeterminado de Apache para permitir que el servidor utilice automáticamente `index.php` como página principal del sitio.
+
+
+#### Comandos utilizados
+
+```bash
+apt install apache2 php libapache2-mod-php -y
+
+systemctl status apache2
+
+cp /root/index.php /var/www/html/
+
+cp /root/logo.png /var/www/html/
+
+rm /var/www/html/index.html
+```
+
+#### Evidencia de servicio Apache activo
+
+![Apache funcionando](Capturas/apache-service-running-ok.png)
+
+#### Evidencia de acceso HTTP desde navegador
+
+![Página por defecto Apache](Capturas/apache-default-page-ok.png)
+
+#### Evidencia de configuración de archivos web
+
+![Archivos web configurados](Capturas/apache-web-files-configured.png)
+
+#### Evidencia inicial de ejecución PHP antes de configurar MariaDB
+
+![Página PHP antes de MariaDB](Capturas/php-page-before-mariadb.png)
+
+
+
+### 12. Instalación y configuración de MariaDB
+
+Se instaló y configuró MariaDB como motor de base de datos para la aplicación web desarrollada en PHP.
+
+Inicialmente se verificó el correcto funcionamiento del servicio utilizando `systemctl status mariadb`, confirmando que el motor SQL se encontraba activo y preparado para recibir conexiones.
+
+Posteriormente se creó la base de datos `ingenieria`, junto con el usuario `lcars`, configurando la contraseña y asignando permisos completos sobre la base de datos mediante instrucciones SQL.
+
+Luego se importó el archivo `db.sql`, el cual contenía la estructura de tablas y registros necesarios para el funcionamiento de la aplicación web.
+
+Durante las pruebas iniciales de funcionamiento, la aplicación web mostró una pantalla en blanco debido a la ausencia del módulo `mysqli` dentro de PHP. Posteriormente se verificó el error consultando el archivo `/var/log/apache2/error.log`, identificando el mensaje `Class "MySQLi" not found`.
+
+Para solucionar el problema se instaló el paquete `php-mysql` y se reinició el servicio Apache, habilitando correctamente la comunicación entre PHP y MariaDB.
+
+Finalmente se verificó el correcto funcionamiento de la integración Apache + PHP + MariaDB accediendo desde la máquina física Windows al sitio web publicado por Apache, observando correctamente la tabla de alumnos obtenida desde la base de datos.
+
+
+#### Comandos utilizados
+
+```bash
+apt install mariadb-server php-mysql -y
+
+systemctl status mariadb
+
+mysql
+```
+
+#### Comandos SQL utilizados
+
+```sql
+CREATE DATABASE ingenieria;
+
+CREATE USER 'lcars'@'localhost' IDENTIFIED BY 'NCC1701D';
+
+GRANT ALL PRIVILEGES ON ingenieria.* TO 'lcars'@'localhost';
+
+FLUSH PRIVILEGES;
+```
+
+#### Importación de base de datos
+
+```bash
+mysql
+
+USE ingenieria;
+
+SOURCE /root/db.sql;
+```
+
+#### Diagnóstico de errores PHP
+
+```bash
+tail -n 40 /var/log/apache2/error.log
+```
+
+#### Instalación de soporte MySQL para PHP
+
+```bash
+apt install php-mysql -y
+
+systemctl restart apache2
+```
+
+#### Evidencia de servicio MariaDB activo
+
+![MariaDB funcionando](Capturas/mariadb-service-running-ok.png)
+
+#### Evidencia de configuración de base de datos y usuario SQL
+
+![Base de datos y usuario configurados](Capturas/mariadb-database-user-configured.png)
+
+#### Evidencia final de aplicación web funcionando
+
+![Aplicación web operativa](Capturas/web-application-working-ok.png)
