@@ -35,10 +35,6 @@ Se modificó la configuración de red de la máquina virtual de “Adaptador Pue
 También se creó un snapshot inicial denominado “Estado inicial limpio”, con el objetivo de disponer de un punto de restauración antes de realizar modificaciones en el sistema.
 
 
-#### Evidencia de importación de la máquina virtual
-
-![VM importada](Capturas/vm-importada.png)
-
 
 ### 2. Recuperación de contraseña root
 
@@ -80,11 +76,6 @@ exec bash
 
 hostname
 ```
-
-#### Evidencia de configuración de hostname
-
-![Hostname configurado](Capturas/hostname-configurado.png)
-
 
 ### 4. Verificación de conectividad de red
 
@@ -182,3 +173,61 @@ uname -r
 #### Evidencia de migración exitosa a Debian 12
 
 ![Debian 12 y kernel 6.1](Capturas/debian12-kernel61-ok.png)
+
+### 7. Instalación y verificación del servicio SSH
+
+Se instaló el servicio OpenSSH Server con el objetivo de permitir la administración remota de la máquina virtual mediante el protocolo SSH.
+
+El servicio SSH permite establecer conexiones remotas seguras utilizando autenticación y cifrado entre cliente y servidor.
+
+Luego de la instalación se verificó el correcto funcionamiento del servicio mediante `systemctl`, comprobando que el daemon `sshd` se encontraba activo y en ejecución.
+
+También se verificó que el servicio se encontrara escuchando conexiones sobre el puerto 22/TCP, correspondiente al puerto estándar utilizado por SSH.
+
+
+#### Comandos utilizados
+
+```bash
+apt install openssh-server -y
+
+systemctl status ssh
+
+ss -tulnp | grep ssh
+```
+
+#### Evidencia de servicio SSH activo
+
+![Servicio SSH activo](Capturas/ssh-service-active.png)
+
+### 8. Configuración de IP estática
+
+Con el objetivo de cumplir los requisitos de conectividad de la consigna, se configuró la interfaz de red de la máquina virtual con una dirección IP estática perteneciente al mismo rango de red de la máquina física.
+
+Inicialmente la interfaz obtenía una dirección dinámica mediante DHCP. Posteriormente se modificó manualmente el archivo `/etc/network/interfaces`, reemplazando la configuración dinámica por parámetros estáticos.
+
+Se configuraron los campos `address`, `netmask`, `gateway` y `dns-nameservers`, estableciendo la dirección IP `192.168.1.50` para la interfaz `enp0s3`.
+
+Luego de aplicar los cambios mediante el reinicio del servicio de red, se verificó el correcto funcionamiento de la conectividad local y el acceso a internet.
+
+
+#### Comandos utilizados
+
+```bash
+ip a
+
+ip route
+
+cat /etc/resolv.conf
+
+vi /etc/network/interfaces
+
+systemctl restart networking
+
+ping -c 4 8.8.8.8
+```
+
+#### Evidencia de configuración de IP estática
+
+![IP estática configurada](Capturas/ip-estatica-ok.png)
+
+
