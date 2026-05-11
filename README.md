@@ -10,17 +10,64 @@ Repositorio grupal del trabajo práctico integrador.
 
 ## Avance del Trabajo
 
-- [x] Entorno VS Code + GitHub configurado
-- [x] VM descargada y descomprimida
+### 1. Configuración del entorno
+- [x] Máquina virtual descargada
+- [x] Archivos .rar descomprimidos
 - [x] VM importada en VirtualBox
 - [x] Snapshot inicial creado
 - [x] Contraseña root restablecida
-- [x] Hostname configurado
-- [x] Conectividad de red verificada
-- [x] Punto 1 completado
-- [ ] Punto 2 completado
-- [ ] Punto 3 completado
-- [ ] Punto 4 completado
+- [x] Hostname configurado como TPServer
+- [x] Sistema actualizado
+- [x] Migración de Debian 11 a Debian 12 realizada
+
+### 2. Servicios
+- [x] Servicio SSH instalado
+- [x] Servicio SSH verificado
+- [x] Acceso SSH remoto funcionando
+- [x] Transferencia SCP funcionando
+- [x] Autenticación SSH mediante claves configurada
+- [x] Apache instalado
+- [x] PHP instalado
+- [x] Apache + PHP funcionando
+- [x] MariaDB instalado
+- [x] Base de datos configurada
+- [x] Usuario SQL configurado
+- [x] Importación de db.sql realizada
+- [x] Integración PHP + MariaDB funcionando
+- [x] Aplicación web operativa
+
+### 3. Configuración de red
+- [x] Conectividad IP verificada
+- [x] Repositorios APT corregidos
+- [x] IP estática configurada
+- [x] Gateway configurado
+- [x] DNS configurado
+- [x] Acceso HTTP desde máquina física verificado
+
+### 4. Almacenamiento
+- [x] Disco adicional de 10 GB agregado
+- [x] Particiones Linux creadas
+- [x] Filesystems EXT4 creados
+- [x] Directorios de montaje configurados
+- [x] UUID obtenidos
+- [x] Montaje automático mediante fstab configurado
+- [x] Migración de archivos web hacia /www_dir realizada
+- [x] Apache reconfigurado hacia /www_dir
+- [x] Aplicación web funcionando desde nuevo almacenamiento
+
+### 5. Backup
+- [ ] Script backup_full.sh desarrollado
+- [ ] Validaciones de origen y destino implementadas
+- [ ] Opción -help implementada
+- [ ] Compresión .tar.gz implementada
+- [ ] Backups almacenados en /backup_dir
+- [ ] Automatización mediante cron configurada
+
+### 6. Entregables
+- [ ] Compresión de directorios solicitados
+- [ ] Split de /var realizado
+- [ ] README.md finalizado
+- [ ] Repositorio GitHub final preparado
 
 
 ## Desarrollo del Trabajo
