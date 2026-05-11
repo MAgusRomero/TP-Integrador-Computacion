@@ -425,3 +425,212 @@ systemctl restart apache2
 #### Evidencia final de aplicación web funcionando
 
 ![Aplicación web operativa](Capturas/web-application-working-ok.png)
+
+### 13. Configuración de almacenamiento adicional
+
+Con el objetivo de separar los datos del sistema de los datos correspondientes a la aplicación web y los backups, se agregó un nuevo disco virtual de 10 GB a la máquina virtual Debian utilizando VirtualBox.
+
+Posteriormente se verificó la detección del nuevo dispositivo mediante herramientas de administración de discos de GNU/Linux, identificándose el nuevo disco como `/dev/sdc`.
+
+Sobre este nuevo disco se crearon dos particiones estándar tipo Linux:
+
+- `/dev/sdc1` → destinada al directorio `/www_dir`
+- `/dev/sdc2` → destinada al directorio `/backup_dir`
+
+Las particiones fueron formateadas utilizando el sistema de archivos EXT4 y posteriormente montadas dentro del sistema operativo.
+
+También se configuró el archivo `/etc/fstab` utilizando UUID para garantizar el montaje automático de ambas particiones al iniciar el sistema operativo.
+
+Finalmente, el contenido del sitio web Apache (`index.php` y `logo.png`) fue migrado desde `/var/www/html` hacia `/www_dir`, y Apache fue reconfigurado para utilizar esta nueva ubicación como `DocumentRoot`.
+
+
+
+#### Verificación de detección del nuevo disco
+
+```bash
+lsblk
+```
+
+#### Evidencia de nuevo disco detectado
+
+![Nuevo disco detectado](Capturas/new-storage-disk-detected.png)
+
+
+
+#### Creación de particiones en el nuevo disco
+
+```bash
+fdisk /dev/sdc
+```
+
+Particiones creadas:
+
+- `/dev/sdc1` → 3 GB
+- `/dev/sdc2` → 6 GB
+
+#### Evidencia de particiones creadas
+
+![Particiones creadas](Capturas/storage-partitions-created.png)
+
+
+
+#### Formateo de particiones EXT4
+
+```bash
+mkfs.ext4 /dev/sdc1
+
+mkfs.ext4 /dev/sdc2
+```
+
+#### Evidencia de creación de filesystems EXT4
+
+![Filesystems EXT4 creados](Capturas/ext4-filesystems-created.png)
+
+
+
+#### Creación de directorios de montaje
+
+```bash
+mkdir /www_dir
+
+mkdir /backup_dir
+```
+
+#### Montaje manual de particiones
+
+```bash
+mount /dev/sdc1 /www_dir
+
+mount /dev/sdc2 /backup_dir
+```
+
+#### Evidencia de particiones montadas
+
+![Particiones montadas](Capturas/partitions-mounted-successfully.png)
+
+
+
+#### Obtención de UUID de particiones
+
+```bash
+blkid
+```
+
+#### Evidencia de UUID generados
+
+![UUID de particiones](Capturas/partition-uuids-generated.png)
+
+
+
+#### Configuración de montaje automático mediante fstab
+
+Archivo editado:
+
+```bash
+nano /etc/fstab
+```
+
+Entradas agregadas:
+
+```fstab
+UUID=bff322cf-cf37-4e67-a302-e680b0e3a6ea /www_dir ext4 defaults 0 2
+UUID=d8d93fbd-4186-40fc-9f8a-110279fa4a8f /backup_dir ext4 defaults 0 2
+```
+
+#### Validación de configuración fstab
+
+```bash
+mount -a
+```
+
+#### Evidencia de montaje automático funcionando
+
+![Montaje automático configurado](Capturas/fstab-automatic-mount-configured.png)
+
+
+
+#### Migración de archivos web al nuevo almacenamiento
+
+```bash
+mv /var/www/html/index.php /www_dir/
+
+mv /var/www/html/logo.png /www_dir/
+```
+
+#### Verificación de archivos migrados
+
+```bash
+ls /www_dir
+```
+
+#### Evidencia de archivos web movidos
+
+![Archivos movidos](Capturas/web-files-moved-to-wwwdir.png)
+
+
+
+#### Reconfiguración de Apache hacia /www_dir
+
+Archivo editado:
+
+```bash
+nano /etc/apache2/sites-available/000-default.conf
+```
+
+Cambio realizado:
+
+```apache
+DocumentRoot /www_dir
+```
+
+#### Evidencia de cambio de DocumentRoot
+
+![DocumentRoot actualizado](Capturas/apache-documentroot-wwwdir.png)
+
+
+
+#### Configuración de permisos Apache sobre /www_dir
+
+Archivo editado:
+
+```bash
+nano /etc/apache2/apache2.conf
+```
+
+Configuración agregada:
+
+```apache
+<Directory /www_dir>
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+```
+
+#### Validación de configuración Apache
+
+```bash
+apache2ctl configtest
+```
+
+Resultado obtenido:
+
+```text
+Syntax OK
+```
+
+#### Reinicio de Apache
+
+```bash
+systemctl restart apache2
+```
+
+#### Evidencia de Apache funcionando con nuevo almacenamiento
+
+![Apache operativo](Capturas/apache-running-with-wwwdir.png)
+
+
+
+#### Evidencia final de aplicación web funcionando desde /www_dir
+
+![Aplicación web funcionando desde nuevo almacenamiento](Capturas/web-application-working-from-wwwdir.png)
