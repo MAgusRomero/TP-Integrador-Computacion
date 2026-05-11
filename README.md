@@ -4,8 +4,11 @@ Repositorio grupal del trabajo práctico integrador.
 
 
 ## Integrantes
-
+- Abril Rios
+- Ariel Alonso
 - Agustin Romero
+- Isaac Mendez
+- Gian Stabile
 
 
 ## Avance del Trabajo
